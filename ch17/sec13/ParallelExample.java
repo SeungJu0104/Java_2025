@@ -1,0 +1,46 @@
+package ch17.sec13;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Stream;
+
+// 포크 조인 프레임워크
+public class ParallelExample {
+	public static void main(String[] args) {
+		Random random = new Random();
+
+		List<Integer> scores = new ArrayList< >();
+		for(int i=0; i<100000000; i++) {
+			scores.add(random.nextInt(101));
+		}
+
+		double avg = 0.0;
+		long startTime = 0;
+		long endTime = 0;
+		long time = 0;
+		
+		// 단일 스레드 처리
+		Stream<Integer> stream = scores.stream();
+		startTime = System.nanoTime();
+		avg = stream
+				.mapToInt(i -> i.intValue())
+				.average()
+				.getAsDouble();
+		endTime = System.nanoTime();
+		time = endTime - startTime; // 단일 스레드 처리 시 경과 시간
+		System.out.println("avg: " + avg + ", 일반 스트림 처리 시간: " + time + "ns"); 
+		
+		
+		// 멀티 스레드 처리
+		Stream<Integer> parallelStream = scores.parallelStream();
+		startTime = System.nanoTime();
+		avg = parallelStream
+				.mapToInt(i -> i.intValue())
+				.average()
+				.getAsDouble();
+		endTime = System.nanoTime();
+		time = endTime - startTime; // 멀티 스레드 처리 시 경과 시간
+		System.out.println("avg: " + avg + ", 병렬 스트림 처리 시간: " + time + "ns"); 
+	}
+}
